@@ -9,7 +9,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 // Create application/x-www-form-urlencoded parser
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const urlencodedParser = bodyParser.urlencoded({ extended: true });
+app.use(express.urlencoded({ extended: true });
+app.use(express.json());
 
 app.use(express.static('public'));
 
